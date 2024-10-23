@@ -1,0 +1,1 @@
+web: java -jar target/virtual-wine-sommelier-backend.jar
