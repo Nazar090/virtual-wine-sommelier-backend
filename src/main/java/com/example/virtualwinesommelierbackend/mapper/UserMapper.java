@@ -1,17 +1,16 @@
-package com.example.onlinebookstore.mapper;
+package com.example.virtualwinesommelierbackend.mapper;
 
-import com.example.onlinebookstore.config.MapperConfig;
-import com.example.onlinebookstore.dto.user.UserRegistrationRequestDto;
-import com.example.onlinebookstore.dto.user.UserResponseDto;
-import com.example.onlinebookstore.model.User;
+import com.example.virtualwinesommelierbackend.config.MapperConfig;
+import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationDto;
+import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationRequestDto;
+import com.example.virtualwinesommelierbackend.model.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.Mapping;
 
-@Mapper(config = MapperConfig.class)
+@Mapper(config = MapperConfig.class, uses = AddressMapper.class)
 public interface UserMapper {
-    UserResponseDto toDto(User user);
+    UserRegistrationDto toDto(User user);
 
+    @Mapping(target = "shippingAddress", source = "shippingAddress")
     User toUserEntity(UserRegistrationRequestDto requestDto);
-
-    void updateUserFromDto(UserRegistrationRequestDto dto, @MappingTarget User user);
 }
