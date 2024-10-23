@@ -19,5 +19,5 @@ databaseChangeLog:
                   name: last_name
                   value: "Admin"
               - column:
-                  name: shipping_address
-                  value: "-"
+                  name: address_id
+                  valueComputed: "(SELECT id FROM address WHERE street='123 Admin St.')"

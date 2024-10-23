@@ -1,6 +1,20 @@
 databaseChangeLog:
   - changeSet:
-      id: 0
-      author: admin
+      id: insert-address-for-admin
+      author: nazar
       changes:
-        -
+        - insert:
+            tableName: address
+            columns:
+              - column:
+                  name: street
+                  value: "123 Admin St."
+              - column:
+                  name: city
+                  value: "AdminCity"
+              - column:
+                  name: area
+                  value: "AdminArea"
+              - column:
+                  name: zip_code
+                  value: "12345"

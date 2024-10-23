@@ -48,4 +48,4 @@ databaseChangeLog:
             baseColumnNames: address_id
             referencedTableName: address
             referencedColumnNames: id
-            constraintName: fk_users_address
+            constraintName: fk_user_address
