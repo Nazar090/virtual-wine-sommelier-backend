@@ -1,4 +1,4 @@
-package com.example.onlinebookstore.exception;
+package com.example.virtualwinesommelierbackend.exception;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -12,11 +12,25 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+/**
+ * Global exception handler to handle specific exceptions across the application.
+ * This class handles validation errors and custom exceptions such as RegistrationException.
+ */
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    /**
+     * Handles validation errors for method arguments that fail validation constraints.
+     *
+     * @param ex the exception that contains details about validation errors.
+     * @param headers the HTTP headers to be returned with the response.
+     * @param status the HTTP status code to be returned.
+     * @param request the current web request.
+     * @return a ResponseEntity containing error details and validation messages.
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -34,10 +48,28 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(body, headers, status);
     }
 
+    /**
+     * Handles RegistrationException when a user tries to register but there's a conflict.
+     *
+     * @param ex the exception thrown when there's a registration conflict.
+     * @return a ResponseEntity containing the error message and HTTP status 409 (Conflict).
+     */
+    @ExceptionHandler(RegistrationException.class)
+    public ResponseEntity<String> handleRegistrationException(RegistrationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    /**
+     * Extracts error messages from FieldError or ObjectError.
+     * If the error is related to a specific field, it returns a formatted message with the field name.
+     *
+     * @param e the error object containing validation details.
+     * @return a formatted error message as a String.
+     */
     private String getErrorMessage(ObjectError e) {
         if (e instanceof FieldError) {
-            String field = ((FieldError) e).getField();
-            String message = e.getDefaultMessage();
+            String field = ((FieldError) e).getField(); // Extract the field with the error
+            String message = e.getDefaultMessage(); // Extract the error message
             return field + " " + message;
         }
         return e.getDefaultMessage();
