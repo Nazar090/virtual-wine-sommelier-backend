@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-address-table
+      author: nazar
+      changes:
+        - createTable:
+            tableName: address
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: street
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: area
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: zip_code
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
