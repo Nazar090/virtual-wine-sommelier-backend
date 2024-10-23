@@ -28,7 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     /**
-     * Filters incoming HTTP requests to validate JWT tokens. If a valid token is found, it sets the authentication
+     * Filters incoming HTTP requests to validate JWT tokens. If a valid token is found,
+     * it sets the authentication
      * context in {@link SecurityContextHolder}.
      *
      * @param request  The incoming HTTP request.

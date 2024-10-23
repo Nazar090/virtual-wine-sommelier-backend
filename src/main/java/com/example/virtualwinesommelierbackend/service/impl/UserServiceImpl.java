@@ -14,6 +14,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 /**
  * Implementation of the {@link UserService} for handling user registration and related operations.
  */
@@ -26,10 +27,12 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
 
     /**
-     * Registers a new user by validating the request, encoding the password, assigning the default role,
+     * Registers a new user by validating the request, encoding the password, assigning
+     * the default role,
      * and saving the user in the repository.
      *
-     * @param requestDto The user registration request data, including email, password, and other details.
+     * @param requestDto The user registration request data, including email, password,
+     *                   and other details.
      * @return A {@link UserRegistrationDto} containing the registered user's details.
      * @throws RegistrationException if a user with the given email already exists.
      * @throws EntityNotFoundException if the default USER role is not found in the database.
