@@ -1,8 +1,10 @@
-package com.example.onlinebookstore.dto.user;
+package com.example.virtualwinesommelierbackend.dto.user;
 
-import com.example.onlinebookstore.validation.PasswordMatches;
+import com.example.virtualwinesommelierbackend.dto.address.AddressRequestDto;
+import com.example.virtualwinesommelierbackend.validation.PasswordMatches;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,6 @@ public class UserRegistrationRequestDto {
     private String firstName;
     @NotBlank
     private String lastName;
-    @NotBlank
-    private String shippingAddress;
+    @NotNull
+    private AddressRequestDto shippingAddress;
 }

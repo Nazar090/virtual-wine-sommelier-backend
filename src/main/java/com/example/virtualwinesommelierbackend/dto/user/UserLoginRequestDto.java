@@ -1,4 +1,4 @@
-package com.example.onlinebookstore.dto.user;
+package com.example.virtualwinesommelierbackend.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
