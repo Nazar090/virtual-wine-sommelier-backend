@@ -1,4 +1,4 @@
 package com.example.virtualwinesommelierbackend.dto.user;
 
-public record UserResponseDto(Long id, String email) {
+public record UserRegistrationDto(Long id, String email) {
 }
