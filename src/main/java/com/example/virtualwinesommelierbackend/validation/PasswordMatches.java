@@ -1,4 +1,4 @@
-package com.example.onlinebookstore.validation;
+package com.example.virtualwinesommelierbackend.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
