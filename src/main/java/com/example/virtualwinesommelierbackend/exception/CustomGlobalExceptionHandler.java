@@ -61,7 +61,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     /**
      * Extracts error messages from FieldError or ObjectError.
-     * If the error is related to a specific field, it returns a formatted message with the field name.
+     * If the error is related to a specific field, it returns a formatted message with
+     * the field name.
      *
      * @param e the error object containing validation details.
      * @return a formatted error message as a String.
