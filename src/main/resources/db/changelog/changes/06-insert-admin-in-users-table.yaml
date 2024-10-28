@@ -20,4 +20,4 @@ databaseChangeLog:
                   value: "Admin"
               - column:
                   name: address_id
-                  valueComputed: "(SELECT id FROM address WHERE street='123 Admin St.')"
+                  valueComputed: "(SELECT id FROM addresses WHERE street='123 Admin St.')"
