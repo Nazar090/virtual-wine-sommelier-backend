@@ -12,7 +12,7 @@ public interface WineService {
 
     List<WineDto> getAll(Pageable pageable);
 
-    void update(Long id, WineRequestDto requestDto);
+    WineDto update(Long id, WineRequestDto requestDto);
 
     void deleteById(Long id);
 }

@@ -12,9 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
-/**
- * Address model for User shipping data
- */
+// Address model for User shipping data
 @Entity
 @Getter
 @Setter
