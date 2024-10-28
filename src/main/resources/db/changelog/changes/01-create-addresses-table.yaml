@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-address-table
+      id: create-addresses-table
       author: nazar
       changes:
         - createTable:
-            tableName: address
+            tableName: addresses
             columns:
               - column:
                   name: id

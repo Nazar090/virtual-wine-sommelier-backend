@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: insert-address-for-admin
+      id: insert-addresses-for-admin
       author: nazar
       changes:
         - insert:
-            tableName: address
+            tableName: addresses
             columns:
               - column:
                   name: street
