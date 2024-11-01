@@ -9,6 +9,7 @@ import com.example.virtualwinesommelierbackend.model.Role;
 import com.example.virtualwinesommelierbackend.model.User;
 import com.example.virtualwinesommelierbackend.repository.RoleRepository;
 import com.example.virtualwinesommelierbackend.repository.UserRepository;
+import com.example.virtualwinesommelierbackend.service.ShoppingCartService;
 import com.example.virtualwinesommelierbackend.service.UserService;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final ShoppingCartService shoppingCartService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
 
     /**
      * Registers a new user by validating the request, encoding the password, assigning
@@ -50,7 +52,7 @@ public class UserServiceImpl implements UserService {
         user.setRoles(Set.of(role));
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         userRepository.save(user);
-        // register shopping cart here(later)
+        shoppingCartService.registerNewShoppingCart(user);
 
         return userMapper.toDto(user);
     }
