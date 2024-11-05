@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class OrderItemDto {
     private Long id;
-    private Long bookId;
+    private Long wineId;
     private int quantity;
 }
