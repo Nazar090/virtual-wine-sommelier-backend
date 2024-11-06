@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @Tag(name = "Orders", description = "Operations related to orders")
 public class OrderController {
     private final OrderService orderService;
@@ -46,19 +46,6 @@ public class OrderController {
             description = "Creates and places a new order in the system")
     public OrderDto createOrder(@RequestBody @Valid OrderRequestDto requestDto) {
         return orderService.createOrder(getUserId(), requestDto);
-    }
-
-    /**
-     * Endpoint to retrieve all orders in the system.
-     *
-     * @return a list of OrderDto representing all orders
-     */
-    @GetMapping
-    @Operation(summary = "Get Order Item Details",
-            description = "Retrieve the details of a specific item within an order"
-                    + " using the order ID and item ID.")
-    public List<OrderDto> getAll() {
-        return orderService.findAll();
     }
 
     /**

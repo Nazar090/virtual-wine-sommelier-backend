@@ -2,6 +2,7 @@ package com.example.virtualwinesommelierbackend.service.impl;
 
 import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationDto;
 import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationRequestDto;
+import com.example.virtualwinesommelierbackend.dto.user.profile.UserDto;
 import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
 import com.example.virtualwinesommelierbackend.exception.RegistrationException;
 import com.example.virtualwinesommelierbackend.mapper.UserMapper;
@@ -9,6 +10,7 @@ import com.example.virtualwinesommelierbackend.model.Role;
 import com.example.virtualwinesommelierbackend.model.User;
 import com.example.virtualwinesommelierbackend.repository.RoleRepository;
 import com.example.virtualwinesommelierbackend.repository.UserRepository;
+import com.example.virtualwinesommelierbackend.security.JwtUtil;
 import com.example.virtualwinesommelierbackend.service.ShoppingCartService;
 import com.example.virtualwinesommelierbackend.service.UserService;
 import java.util.Set;
@@ -27,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private final ShoppingCartService shoppingCartService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
 
     /**
      * Registers a new user by validating the request, encoding the password, assigning
@@ -55,5 +59,12 @@ public class UserServiceImpl implements UserService {
         shoppingCartService.registerNewShoppingCart(user);
 
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public UserDto getUserInfo() {
+        // Authentication
+        // return userRepository;
+        return null;
     }
 }
