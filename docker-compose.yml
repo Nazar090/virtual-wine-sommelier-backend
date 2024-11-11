@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    networks:
+      - wine-sommelier-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wine_sommelier_app:
+    image: nazar5n/virtual-wine-sommelier:0.0.1
+    container_name: wine-sommelier-app
+    environment:
+      SPRING_DATASOURCE_URL: ${POSTGRES_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8080"
+    networks:
+      - wine-sommelier-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  wine-sommelier-network:
+    driver: bridge
