@@ -3,8 +3,7 @@ package com.example.virtualwinesommelierbackend.controller;
 import com.example.virtualwinesommelierbackend.dto.order.OrderDto;
 import com.example.virtualwinesommelierbackend.dto.order.OrderRequestDto;
 import com.example.virtualwinesommelierbackend.dto.orderitem.OrderItemDto;
-import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
-import com.example.virtualwinesommelierbackend.model.User;
+import com.example.virtualwinesommelierbackend.security.AuthenticationService;
 import com.example.virtualwinesommelierbackend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,9 +11,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,10 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @Tag(name = "Orders", description = "Operations related to orders")
 public class OrderController {
     private final OrderService orderService;
+    private final AuthenticationService authService;
 
     /**
      * Endpoint to create and place a new order.
@@ -45,20 +42,7 @@ public class OrderController {
     @Operation(summary = "Place a new order",
             description = "Creates and places a new order in the system")
     public OrderDto createOrder(@RequestBody @Valid OrderRequestDto requestDto) {
-        return orderService.createOrder(getUserId(), requestDto);
-    }
-
-    /**
-     * Endpoint to retrieve all orders in the system.
-     *
-     * @return a list of OrderDto representing all orders
-     */
-    @GetMapping
-    @Operation(summary = "Get Order Item Details",
-            description = "Retrieve the details of a specific item within an order"
-                    + " using the order ID and item ID.")
-    public List<OrderDto> getAll() {
-        return orderService.findAll();
+        return orderService.createOrder(authService.getUserId(), requestDto);
     }
 
     /**
@@ -87,21 +71,5 @@ public class OrderController {
                     + "using the order ID and item ID.")
     public OrderItemDto getItemById(@PathVariable Long orderId, @PathVariable Long id) {
         return orderService.getItemById(orderId, id);
-    }
-
-    /**
-     * Helper method to retrieve the user ID of the currently authenticated user.
-     *
-     * @return the ID of the currently authenticated user
-     * @throws EntityNotFoundException if the user is not found in the authentication context
-     */
-    private Long getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            User user = (User) authentication.getPrincipal();
-            return user.getId();
-        }
-        throw new EntityNotFoundException(
-                "Can't find authentication name by authentication " + authentication);
     }
 }
