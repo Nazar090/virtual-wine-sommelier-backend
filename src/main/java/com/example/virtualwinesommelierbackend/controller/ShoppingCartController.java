@@ -3,17 +3,13 @@ package com.example.virtualwinesommelierbackend.controller;
 import com.example.virtualwinesommelierbackend.dto.cart.ShoppingCartDto;
 import com.example.virtualwinesommelierbackend.dto.cartitem.CartItemQuantityDto;
 import com.example.virtualwinesommelierbackend.dto.cartitem.CartItemRequestDto;
-import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
-import com.example.virtualwinesommelierbackend.model.User;
+import com.example.virtualwinesommelierbackend.security.AuthenticationService;
 import com.example.virtualwinesommelierbackend.service.ShoppingCartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Shopping cart", description = "Operations related to shopping cart")
 public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
+    private final AuthenticationService authService;
 
     /**
      * Adds an item to the user's shopping cart.
@@ -45,7 +42,7 @@ public class ShoppingCartController {
     @Operation(summary = "Add a cart item", description = "Add a cart item to shopping cart")
     public ShoppingCartDto addCartItem(
             @RequestBody @Valid CartItemRequestDto cartItemRequestDto) {
-        return shoppingCartService.addCartItem(getUserId(), cartItemRequestDto);
+        return shoppingCartService.addCartItem(authService.getUserId(), cartItemRequestDto);
     }
 
     /**
@@ -56,7 +53,7 @@ public class ShoppingCartController {
     @GetMapping
     @Operation(summary = "Get a shopping cart", description = "Get a shopping cart")
     public ShoppingCartDto getShoppingCart() {
-        return shoppingCartService.getShoppingCartByUserId(getUserId());
+        return shoppingCartService.getShoppingCartByUserId(authService.getUserId());
     }
 
     /**
@@ -72,7 +69,7 @@ public class ShoppingCartController {
             @PathVariable Long cartItemId,
             @RequestBody @Valid CartItemQuantityDto cartItemQuantityDto) {
         return shoppingCartService.updateProductQuantity(
-                getUserId(),
+                authService.getUserId(),
                 cartItemId,
                 cartItemQuantityDto);
     }
@@ -87,15 +84,5 @@ public class ShoppingCartController {
     @Operation(summary = "Delete a cart item", description = "Delete a cart item id")
     public void deleteCartItem(@PathVariable Long cartItemId) {
         shoppingCartService.deleteCartItemById(cartItemId);
-    }
-
-    private Long getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            User user = (User) authentication.getPrincipal();
-            return user.getId();
-        }
-        throw new EntityNotFoundException(
-                "Can't find authentication name by authentication " + authentication);
     }
 }
