@@ -5,6 +5,7 @@ import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationDto;
 import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationRequestDto;
 import com.example.virtualwinesommelierbackend.dto.user.profile.UserDto;
 import com.example.virtualwinesommelierbackend.dto.user.profile.UserRequestDto;
+import com.example.virtualwinesommelierbackend.dto.user.profile.UserRoleRequestDto;
 import com.example.virtualwinesommelierbackend.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,4 +21,6 @@ public interface UserMapper {
     User toUserEntityFromRegistration(UserRegistrationRequestDto requestDto);
 
     void updateUserInfo(UserRequestDto requestDto, @MappingTarget User user);
+
+    void updateUserInfo(UserRoleRequestDto requestDto, @MappingTarget User user);
 }

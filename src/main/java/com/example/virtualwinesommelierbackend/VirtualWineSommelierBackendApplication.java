@@ -9,7 +9,8 @@ public class VirtualWineSommelierBackendApplication {
 
     public static void main(String[] args) {
         // Load environment variables from the .env file
-        Dotenv dotenv = Dotenv.configure().load();
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 
         SpringApplication.run(VirtualWineSommelierBackendApplication.class, args);
     }

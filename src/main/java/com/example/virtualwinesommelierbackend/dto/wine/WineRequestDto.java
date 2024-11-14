@@ -15,6 +15,8 @@ public class WineRequestDto {
     @NotBlank
     private String type;
     @NotBlank
+    private String color;
+    @NotBlank
     private String strength;
     @NotBlank
     private String country;

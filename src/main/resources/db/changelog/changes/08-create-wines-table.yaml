@@ -25,6 +25,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: color
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
                   name: strength
                   type: VARCHAR(50)
                   constraints:
@@ -46,6 +51,6 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: description
-                  type: VARCHAR(255)
+                  type: VARCHAR(1500)
                   constraints:
                     nullable: false
