@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "Orders", description = "Operations related to users profile")
+@Tag(name = "User profile", description = "Operations related to users profile")
 public class UserController {
     private final OrderService orderService;
     private final UserService userService;
