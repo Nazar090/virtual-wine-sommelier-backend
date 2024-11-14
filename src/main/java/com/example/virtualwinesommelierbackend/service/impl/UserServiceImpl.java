@@ -4,6 +4,7 @@ import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationDto;
 import com.example.virtualwinesommelierbackend.dto.user.UserRegistrationRequestDto;
 import com.example.virtualwinesommelierbackend.dto.user.profile.UserDto;
 import com.example.virtualwinesommelierbackend.dto.user.profile.UserRequestDto;
+import com.example.virtualwinesommelierbackend.dto.user.profile.UserRoleRequestDto;
 import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
 import com.example.virtualwinesommelierbackend.exception.RegistrationException;
 import com.example.virtualwinesommelierbackend.mapper.UserMapper;
@@ -14,6 +15,7 @@ import com.example.virtualwinesommelierbackend.repository.UserRepository;
 import com.example.virtualwinesommelierbackend.security.AuthenticationService;
 import com.example.virtualwinesommelierbackend.service.ShoppingCartService;
 import com.example.virtualwinesommelierbackend.service.UserService;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -89,5 +91,21 @@ public class UserServiceImpl implements UserService {
                         "User not found by id: " + authService.getUserId()));
         userMapper.updateUserInfo(requestDto, user);
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Override
+    public UserDto updateUserRoleInfo(Long id, UserRoleRequestDto requestDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User not found by id: " + authService.getUserId()));
+        userMapper.updateUserInfo(requestDto, user);
+        return userMapper.toDto(userRepository.save(user));
+    }
+
+    @Override
+    public List<UserDto> getAll() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 }
