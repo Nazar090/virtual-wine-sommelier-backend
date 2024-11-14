@@ -93,6 +93,13 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    /**
+     * Updates the role information of a specific user.
+     *
+     * @param id the ID of the user whose role information is being updated.
+     * @param requestDto the role update request data.
+     * @return UserDto containing the updated user role details.
+     */
     @Override
     public UserDto updateUserRoleInfo(Long id, UserRoleRequestDto requestDto) {
         User user = userRepository.findById(id)
@@ -102,6 +109,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    /**
+     * Retrieves a list of all users in the system.
+     *
+     * @return a list of UserDto representing all users.
+     */
     @Override
     public List<UserDto> getAll() {
         return userRepository.findAll().stream()
