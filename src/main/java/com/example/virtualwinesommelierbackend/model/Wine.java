@@ -29,6 +29,9 @@ public class Wine {
     private String type;
     @Column(nullable = false)
     @Length(max = 50)
+    private String color;
+    @Column(nullable = false)
+    @Length(max = 50)
     private String strength;
     @Column(nullable = false)
     @Length(max = 50)
@@ -40,7 +43,7 @@ public class Wine {
     @Min(0)
     private BigDecimal price;
     @Column(nullable = false)
-    @Length(max = 255)
+    @Length(max = 1500)
     private String description;
 
 }
