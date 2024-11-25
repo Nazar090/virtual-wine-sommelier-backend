@@ -38,8 +38,9 @@ public class Order {
     private BigDecimal total;
     @Column(nullable = false)
     private LocalDateTime orderDate = LocalDateTime.now();
-    @Column(nullable = false)
-    private String shippingAddress;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address shippingAddress;
     @OneToMany(mappedBy = "order",
             cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();
