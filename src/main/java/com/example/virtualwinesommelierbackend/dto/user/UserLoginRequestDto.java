@@ -5,11 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record UserLoginRequestDto(
-        @NotBlank
+        @NotBlank(message = "Email can't be empty")
         @Size(min = 8, max = 35)
         @Email
         String email,
-        @NotBlank
+        @NotBlank(message = "Password can't be empty")
         @Size(min = 8, max = 35)
         String password
 ) {
