@@ -1,14 +1,15 @@
 package com.example.virtualwinesommelierbackend.dto.order;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import com.example.virtualwinesommelierbackend.dto.address.AddressRequestDto;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
+@Accessors(chain = true)
 public class OrderRequestDto {
-    @NotBlank
-    @Size(min = 10, max = 55)
-    private String shippingAddress;
+    @NotNull(message = "Address can't be null")
+    private AddressRequestDto shippingAddress;
 }

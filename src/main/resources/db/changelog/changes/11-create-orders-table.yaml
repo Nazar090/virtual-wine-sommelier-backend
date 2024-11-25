@@ -34,13 +34,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: shipping_address
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+                  name: address_id
+                  type: BIGINT
         - addForeignKeyConstraint:
             baseTableName: orders
             baseColumnNames: user_id
             referencedTableName: users
             referencedColumnNames: id
             constraintName: fk_orders_users
+        - addForeignKeyConstraint:
+            baseTableName: orders
+            baseColumnNames: address_id
+            referencedTableName: addresses
+            referencedColumnNames: id
+            constraintName: fk_order_address

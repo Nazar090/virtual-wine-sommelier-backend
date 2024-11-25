@@ -1,0 +1,5 @@
+DELETE FROM order_items;
+
+DELETE FROM orders;
+
+TRUNCATE TABLE users CASCADE;
