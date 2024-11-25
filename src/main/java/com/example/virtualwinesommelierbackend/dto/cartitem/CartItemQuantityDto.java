@@ -1,10 +1,12 @@
 package com.example.virtualwinesommelierbackend.dto.cartitem;
 
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 public class CartItemQuantityDto {
-    @Positive
+    @Positive(message = "Quantity can has only positive value")
     private int quantity;
 }
