@@ -1,0 +1,3 @@
+DELETE FROM users_roles;
+TRUNCATE TABLE users CASCADE;
+DELETE FROM roles;
