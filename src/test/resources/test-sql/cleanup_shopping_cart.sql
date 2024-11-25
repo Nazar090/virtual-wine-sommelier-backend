@@ -1,0 +1,4 @@
+DELETE FROM cart_items;
+TRUNCATE TABLE shopping_carts CASCADE;
+DELETE FROM wines;
+TRUNCATE TABLE users CASCADE;
