@@ -19,7 +19,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -78,7 +77,6 @@ class ProductControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void findAll_ShouldReturnPaginatedWineList() throws Exception {
-        Pageable pageable = PageRequest.of(0, 10);
         List<WineDto> expectedWines = List.of(
                 new WineDto(1L, "Wine 1", "Red", "France",
                         "Merlot", "Dry", "13%",
