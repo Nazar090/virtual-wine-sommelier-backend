@@ -1,11 +1,11 @@
 package com.example.virtualwinesommelierbackend.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.virtualwinesommelierbackend.dto.wine.ProductDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineDto;
 import com.example.virtualwinesommelierbackend.security.JwtUtil;
 import com.example.virtualwinesommelierbackend.service.WineService;
@@ -19,7 +19,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -77,7 +76,7 @@ class ProductControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void findAll_ShouldReturnPaginatedWineList() throws Exception {
-        List<WineDto> expectedWines = List.of(
+        List<WineDto> wines = List.of(
                 new WineDto(1L, "Wine 1", "Red", "France",
                         "Merlot", "Dry", "13%",
                         BigDecimal.valueOf(25.00), "Wine 1 description"),
@@ -86,23 +85,22 @@ class ProductControllerTest {
                         "Chardonnay", "Semi-Dry", "12%",
                         BigDecimal.valueOf(30.00), "Wine 2 description")
         );
+        ProductDto expectedWines = new ProductDto();
+        expectedWines.setWineDtos(wines);
+        expectedWines.setTotalProducts(wines.size());
 
-        Mockito.when(wineService.getAll(any(Pageable.class))).thenReturn(expectedWines);
+        Mockito.when(wineService.getAll()).thenReturn(expectedWines);
 
-        MvcResult result = mockMvc.perform(get("/api/products")
-                        .param("page", "0")
-                        .param("size", "10"))
+        MvcResult result = mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        List<WineDto> actualWines = objectMapper.readValue(
-                jsonResponse,
-                objectMapper.getTypeFactory().constructCollectionType(List.class, WineDto.class)
-        );
+        ProductDto actualWines = objectMapper.readValue(jsonResponse, ProductDto.class);
 
         Assertions.assertNotNull(actualWines);
-        Assertions.assertEquals(expectedWines.size(), actualWines.size());
-        Assertions.assertEquals(expectedWines, actualWines);
+        Assertions.assertEquals(expectedWines.getWineDtos().size(),
+                actualWines.getWineDtos().size());
+        Assertions.assertEquals(expectedWines.getWineDtos(), actualWines.getWineDtos());
     }
 }

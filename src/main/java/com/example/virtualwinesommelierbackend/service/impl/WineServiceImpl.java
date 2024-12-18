@@ -1,5 +1,6 @@
 package com.example.virtualwinesommelierbackend.service.impl;
 
+import com.example.virtualwinesommelierbackend.dto.wine.ProductDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineRequestDto;
 import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
@@ -9,7 +10,6 @@ import com.example.virtualwinesommelierbackend.repository.WineRepository;
 import com.example.virtualwinesommelierbackend.service.WineService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,14 +49,15 @@ public class WineServiceImpl implements WineService {
     /**
      * Retrieves all products form the DB with pagination and sorting options.
      *
-     * @param pageable an object containing pagination and sorting information.
-     * @return a list of WineDto objects representing the wine products in the system
+     * @return a ProductDto objects representing the wine products in the system + their total count
      */
     @Override
-    public List<WineDto> getAll(Pageable pageable) {
-        return wineRepository.findAll(pageable).stream()
-                .map(wineMapper::toDto)
-                .toList();
+    public ProductDto getAll() {
+        ProductDto product = new ProductDto();
+        List<Wine> wines = wineRepository.findAll();
+        product.setWineDtos(wines.stream().map(wineMapper::toDto).toList());
+        product.setTotalProducts(wines.size());
+        return product;
     }
 
     /**
