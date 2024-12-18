@@ -1,12 +1,11 @@
 package com.example.virtualwinesommelierbackend.controller;
 
+import com.example.virtualwinesommelierbackend.dto.wine.ProductDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineDto;
 import com.example.virtualwinesommelierbackend.service.WineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,16 +37,13 @@ public class ProductController {
     /**
      * Method responsible for retrieves a paginated and sorted list of all wines.
      *
-     * @param pageable provides pagination and sorting information, allowing the client
-     *                to specify the page number, page size, and sorting options for
-     *                the results.
-     * @return a list of WineDto objects representing the wine data that matches the
+     * @return a ProductDto objects representing the wine data that matches the
      *         pagination and sorting criteria provided.
      */
     @GetMapping
     @Operation(summary = "Get all wines",
-            description = "Retrieve a list of all wines with pagination and sorting options")
-    public List<WineDto> findAll(Pageable pageable) {
-        return wineService.getAll(pageable);
+            description = "Retrieve a list of all wines and count of them")
+    public ProductDto findAll() {
+        return wineService.getAll();
     }
 }
