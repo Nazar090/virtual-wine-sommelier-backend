@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.virtualwinesommelierbackend.dto.wine.ProductDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineRequestDto;
 import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
@@ -24,9 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 class WineServiceImplTest {
 
@@ -96,17 +93,17 @@ class WineServiceImplTest {
 
     @Test
     void testGetAll() {
-        Pageable pageable = mock(Pageable.class);
-        Page<Wine> page = new PageImpl<>(List.of(wine));
-        when(wineRepository.findAll(pageable)).thenReturn(page);
+        List<Wine> wines = List.of(wine);
+        when(wineRepository.findAll()).thenReturn(wines);
         when(wineMapper.toDto(wine)).thenReturn(wineDto);
 
-        List<WineDto> result = wineService.getAll(pageable);
+        ProductDto result = wineService.getAll();
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(wineDto, result.get(0));
-        verify(wineRepository).findAll(pageable);
+        assertEquals(1, result.getWineDtos().size());
+        assertEquals(wineDto, result.getWineDtos().get(0));
+
+        verify(wineRepository).findAll();
         verify(wineMapper).toDto(wine);
     }
 
