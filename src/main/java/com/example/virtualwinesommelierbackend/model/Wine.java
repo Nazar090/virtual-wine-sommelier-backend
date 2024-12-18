@@ -45,5 +45,4 @@ public class Wine {
     @Column(nullable = false)
     @Length(max = 1500)
     private String description;
-
 }
