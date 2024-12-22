@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-image-url-to-wines
+      author: nazar
+      changes:
+        - addColumn:
+            tableName: wines
+            columns:
+              - column:
+                  name: image_url
+                  type: varchar(512)
+                  remarks: "URL for wine image"

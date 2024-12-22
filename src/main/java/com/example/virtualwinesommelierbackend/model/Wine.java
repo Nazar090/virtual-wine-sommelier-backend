@@ -45,4 +45,6 @@ public class Wine {
     @Column(nullable = false)
     @Length(max = 1500)
     private String description;
+    @Column(name = "image_url")
+    private String imageUrl;
 }
