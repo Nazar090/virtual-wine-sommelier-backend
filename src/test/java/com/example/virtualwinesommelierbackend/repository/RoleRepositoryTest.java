@@ -18,6 +18,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Sql(scripts = {
+        "classpath:database/cleanup/cleanup-tables.sql",
+        "classpath:database/initialize/add-users-and-roles.sql",
+        "classpath:database/initialize/add-user-order-wines-orderitems.sql",
+}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -43,10 +48,6 @@ class RoleRepositoryTest {
     }
 
     @Test
-    @Sql(scripts = "classpath:test-sql/initialize_roles.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:test-sql/cleanup_roles.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByRole_ShouldReturnRole_WhenRoleExists() {
         Optional<Role> foundRole = roleRepository.findByRole(Role.RoleName.ADMIN);
 

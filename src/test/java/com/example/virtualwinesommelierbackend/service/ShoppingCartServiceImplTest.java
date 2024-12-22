@@ -79,6 +79,7 @@ class ShoppingCartServiceImplTest {
         ShoppingCartDto result = shoppingCartService.getShoppingCartByUserId(1L);
 
         assertEquals(shoppingCartDto, result);
+
         verify(shoppingCartRepository).findByUserId(1L);
         verify(shoppingCartMapper).toDto(shoppingCart);
     }
@@ -102,6 +103,7 @@ class ShoppingCartServiceImplTest {
 
         assertEquals(shoppingCartDto, result);
         assertEquals(2, cartItem.getQuantity());
+
         verify(cartItemRepository).save(cartItem);
     }
 
@@ -122,6 +124,7 @@ class ShoppingCartServiceImplTest {
         ShoppingCartDto result = shoppingCartService.addCartItem(1L, requestDto);
 
         assertEquals(shoppingCartDto, result);
+
         verify(cartItemRepository).save(newCartItem);
         assertEquals(wine, newCartItem.getWine());;
     }
@@ -141,6 +144,7 @@ class ShoppingCartServiceImplTest {
 
         assertEquals(shoppingCartDto, result);
         assertEquals(3, cartItem.getQuantity());
+
         verify(cartItemRepository).save(cartItem);
     }
 
@@ -164,6 +168,7 @@ class ShoppingCartServiceImplTest {
     @Test
     void testDeleteCartItemById() {
         shoppingCartService.deleteCartItemById(1L);
+
         verify(cartItemRepository).deleteById(1L);
     }
 
@@ -171,7 +176,9 @@ class ShoppingCartServiceImplTest {
     void testRegisterNewShoppingCart() {
         shoppingCartService.registerNewShoppingCart(user);
         ArgumentCaptor<ShoppingCart> captor = ArgumentCaptor.forClass(ShoppingCart.class);
+
         verify(shoppingCartRepository).save(captor.capture());
+
         assertEquals(user, captor.getValue().getUser());
     }
 }

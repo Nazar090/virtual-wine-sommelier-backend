@@ -14,6 +14,7 @@ import com.example.virtualwinesommelierbackend.dto.wine.WineRequestDto;
 import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
 import com.example.virtualwinesommelierbackend.mapper.WineMapper;
 import com.example.virtualwinesommelierbackend.model.Wine;
+import com.example.virtualwinesommelierbackend.repository.OrderItemRepository;
 import com.example.virtualwinesommelierbackend.repository.WineRepository;
 import com.example.virtualwinesommelierbackend.service.impl.WineServiceImpl;
 import java.math.BigDecimal;
@@ -26,9 +27,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 class WineServiceImplTest {
-
     @Mock
     private WineRepository wineRepository;
+
+    @Mock
+    private OrderItemRepository orderItemRepository;
 
     @Mock
     private WineMapper wineMapper;
@@ -48,8 +51,15 @@ class WineServiceImplTest {
         wine = new Wine();
         wine.setId(1L);
 
-        wineDto = new WineDto(1L, "test", "test", "test",
-                "test", "test", "test", BigDecimal.TEN, "test");
+        wineDto = new WineDto()
+                .setId(1L)
+                .setName("Sample Wine")
+                .setType("Dry")
+                .setColor("Red")
+                .setStrength("13%")
+                .setCountry("France")
+                .setPrice(BigDecimal.valueOf(20.00))
+                .setDescription("Description here");
 
         wineRequestDto = new WineRequestDto();
     }
@@ -64,6 +74,7 @@ class WineServiceImplTest {
 
         assertNotNull(result);
         assertEquals(wineDto, result);
+
         verify(wineMapper).toEntity(wineRequestDto);
         verify(wineRepository).save(wine);
         verify(wineMapper).toDto(wine);
@@ -78,6 +89,7 @@ class WineServiceImplTest {
 
         assertNotNull(result);
         assertEquals(wineDto, result);
+
         verify(wineRepository).findById(1L);
         verify(wineMapper).toDto(wine);
     }
@@ -87,6 +99,7 @@ class WineServiceImplTest {
         when(wineRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> wineService.getById(1L));
+
         verify(wineRepository).findById(1L);
         verify(wineMapper, never()).toDto(any());
     }
@@ -117,6 +130,7 @@ class WineServiceImplTest {
 
         assertNotNull(result);
         assertEquals(wineDto, result);
+
         verify(wineRepository).findById(1L);
         verify(wineMapper).updateWineFromDto(wineRequestDto, wine);
         verify(wineRepository).save(wine);
@@ -128,13 +142,14 @@ class WineServiceImplTest {
         when(wineRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> wineService.update(1L, wineRequestDto));
+
         verify(wineRepository).findById(1L);
         verify(wineMapper, never()).updateWineFromDto(any(), any());
         verify(wineRepository, never()).save(any());
     }
 
     @Test
-    void testDeleteById() {
+    void testDeleteWineById() {
         wineService.deleteById(1L);
 
         verify(wineRepository).deleteById(1L);

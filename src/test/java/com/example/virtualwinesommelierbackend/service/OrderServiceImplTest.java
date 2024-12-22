@@ -56,6 +56,7 @@ public class OrderServiceImplTest {
         var result = orderService.findAll();
 
         verify(orderRepository, times(1)).findAll();
+
         assertEquals(1, result.size());
         assertEquals(orderDto, result.get(0));
     }
@@ -85,6 +86,7 @@ public class OrderServiceImplTest {
         var result = orderService.getOrderItemsByOrderId(orderId);
 
         verify(orderRepository, times(1)).findById(orderId);
+
         assertEquals(1, result.size());
         assertEquals(orderItemDto, result.get(0));
     }
@@ -116,6 +118,7 @@ public class OrderServiceImplTest {
 
         verify(orderItemRepository, times(1))
                 .findByIdAndOrderId(itemId, orderId);
+
         assertEquals(orderItemDto, result);
     }
 
@@ -144,6 +147,7 @@ public class OrderServiceImplTest {
         orderService.updateStatus(orderId, statusDto);
 
         verify(orderRepository, times(1)).save(order);
+
         assertEquals(Order.Status.DELIVERED, order.getStatus());
     }
 }
