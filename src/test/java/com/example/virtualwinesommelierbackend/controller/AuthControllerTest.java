@@ -56,19 +56,10 @@ class AuthControllerTest {
 
     @Test
     void registerUser_ShouldReturnRegisteredUser() throws Exception {
-        UserRegistrationRequestDto requestDto = new UserRegistrationRequestDto()
-                .setFirstName("John")
-                .setLastName("Doe")
-                .setEmail("john.doe@example.com")
-                .setPassword("Password@123")
-                .setRepeatPassword("Password@123")
-                .setShippingAddress(new AddressRequestDto()
-                        .setArea("Area")
-                        .setStreet("123 Main St")
-                        .setCity("Springfield")
-                        .setZipCode("12345"));
-
-        UserRegistrationDto expected = new UserRegistrationDto(1L, "john.doe@example.com");
+        UserRegistrationRequestDto requestDto = createUserRegistration();
+        UserRegistrationDto expected = new UserRegistrationDto()
+                .setId(1L)
+                .setEmail("john.doe@example.com");
 
         Mockito.when(userService.register(any(UserRegistrationRequestDto.class)))
                 .thenReturn(expected);
@@ -84,24 +75,13 @@ class AuthControllerTest {
         UserRegistrationDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), UserRegistrationDto.class);
         Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.id());
-        Assertions.assertEquals(expected.email(), actual.email());
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertNotNull(actual.getId());
+        Assertions.assertEquals(expected.getEmail(), actual.getEmail());
     }
 
     @Test
     void registerUser_ShouldReturnBadRequestOnRegistrationException() throws Exception {
-        UserRegistrationRequestDto requestDto = new UserRegistrationRequestDto()
-                .setFirstName("John")
-                .setLastName("Doe")
-                .setEmail("john.doe@example.com")
-                .setPassword("Password@123")
-                .setRepeatPassword("Password@123")
-                .setShippingAddress(new AddressRequestDto()
-                        .setArea("Area")
-                        .setStreet("123 Main St")
-                        .setCity("Springfield")
-                        .setZipCode("12345"));
+        UserRegistrationRequestDto requestDto = createUserRegistration();
 
         Mockito.when(userService.register(any(UserRegistrationRequestDto.class)))
                 .thenThrow(new RegistrationException("User already exists"));
@@ -120,9 +100,10 @@ class AuthControllerTest {
 
     @Test
     void login_ShouldReturnJwtToken() throws Exception {
-        UserLoginRequestDto requestDto = new UserLoginRequestDto("john.doe@example.com",
-                "password123");
-        UserLoginDto expectedResponse = new UserLoginDto("some-jwt-token");
+        UserLoginRequestDto requestDto = new UserLoginRequestDto()
+                .setEmail("john.doe@example.com")
+                .setPassword("password123");
+        UserLoginDto expectedResponse = new UserLoginDto().setToken("some-jwt-token");
 
         Mockito.when(authenticationService.authenticate(any(UserLoginRequestDto.class)))
                 .thenReturn(expectedResponse);
@@ -139,8 +120,7 @@ class AuthControllerTest {
         UserLoginDto actualResponse = objectMapper.readValue(jsonResponse, UserLoginDto.class);
 
         Assertions.assertNotNull(actualResponse);
-        Assertions.assertEquals(expectedResponse.token(), actualResponse.token());
-        Assertions.assertEquals(expectedResponse, actualResponse);
+        Assertions.assertEquals(expectedResponse.getToken(), actualResponse.getToken());
     }
 
     @Test
@@ -151,5 +131,21 @@ class AuthControllerTest {
 
         String jsonResponse = result.getResponse().getContentAsString();
         Assertions.assertEquals("{\"message\": \"Logout successful\"}", jsonResponse);
+    }
+
+    // Helper Methods
+
+    private UserRegistrationRequestDto createUserRegistration() {
+        return new UserRegistrationRequestDto()
+                .setFirstName("John")
+                .setLastName("Doe")
+                .setEmail("john.doe@example.com")
+                .setPassword("Password@123")
+                .setRepeatPassword("Password@123")
+                .setShippingAddress(new AddressRequestDto()
+                        .setArea("Area")
+                        .setStreet("123 Main St")
+                        .setCity("Springfield")
+                        .setZipCode("12345"));
     }
 }
