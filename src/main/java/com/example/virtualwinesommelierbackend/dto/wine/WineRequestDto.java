@@ -47,4 +47,8 @@ public class WineRequestDto {
     @NotBlank(message = "Description is required")
     @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
+
+    @NotBlank(message = "Image url is required")
+    @Size(max = 512, message = "Image url cannot exceed 512 characters")
+    private String imageUrl;
 }
