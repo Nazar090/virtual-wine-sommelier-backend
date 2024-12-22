@@ -18,4 +18,5 @@ public class WineDto {
     private String grape;
     private BigDecimal price;
     private String description;
+    private String imageUrl;
 }

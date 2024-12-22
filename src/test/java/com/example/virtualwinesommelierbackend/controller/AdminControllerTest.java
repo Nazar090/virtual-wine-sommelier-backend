@@ -254,7 +254,8 @@ class AdminControllerTest {
                 .setCountry("Italy")
                 .setGrape("Merlot")
                 .setPrice(BigDecimal.valueOf(20.00))
-                .setDescription("Rich red wine");
+                .setDescription("Rich red wine")
+                .setImageUrl("url");
     }
 
     private WineRequestDto createWineRequestDto(String name, String type, String color) {
@@ -266,7 +267,8 @@ class AdminControllerTest {
                 .setCountry("Italy")
                 .setGrape("Merlot")
                 .setPrice(BigDecimal.valueOf(20.00))
-                .setDescription("Rich red wine");
+                .setDescription("Rich red wine")
+                .setImageUrl("url");
     }
 
     private OrderDto createOrderDto(Long id, BigDecimal total) {
