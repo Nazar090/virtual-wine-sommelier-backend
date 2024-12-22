@@ -93,6 +93,7 @@ class UserServiceImplTest {
         UserRegistrationDto result = userService.register(registrationRequest);
 
         assertEquals(registrationDto, result);
+
         verify(userRepository).save(user);
         verify(shoppingCartService).registerNewShoppingCart(user);
     }

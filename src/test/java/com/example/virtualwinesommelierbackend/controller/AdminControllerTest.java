@@ -1,68 +1,55 @@
 package com.example.virtualwinesommelierbackend.controller;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.virtualwinesommelierbackend.dto.address.AddressDto;
 import com.example.virtualwinesommelierbackend.dto.order.OrderDto;
 import com.example.virtualwinesommelierbackend.dto.order.OrderStatusDto;
-import com.example.virtualwinesommelierbackend.dto.orderitem.OrderItemDto;
 import com.example.virtualwinesommelierbackend.dto.user.profile.UserDto;
 import com.example.virtualwinesommelierbackend.dto.user.profile.UserRoleRequestDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineRequestDto;
 import com.example.virtualwinesommelierbackend.model.Order;
+import com.example.virtualwinesommelierbackend.model.Role;
 import com.example.virtualwinesommelierbackend.security.JwtUtil;
-import com.example.virtualwinesommelierbackend.service.OrderService;
-import com.example.virtualwinesommelierbackend.service.UserService;
-import com.example.virtualwinesommelierbackend.service.WineService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+@Sql(scripts = {
+        "classpath:database/cleanup/cleanup-tables.sql",
+        "classpath:database/initialize/add-users-and-roles.sql",
+        "classpath:database/initialize/add-user-order-wines-orderitems.sql",
+}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AdminControllerTest {
     protected static MockMvc mockMvc;
 
-    @MockBean
-    private JwtUtil jwtUtil;
-
-    @MockBean
-    private WineService wineService;
-
-    @MockBean
-    private OrderService orderService;
-
-    @MockBean
-    private UserService userService;
-
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtUtil jwtUtil;
 
     @BeforeAll
     static void beforeAll(
@@ -74,203 +61,228 @@ class AdminControllerTest {
                 .build();
     }
 
-    // Catalog Tests
+    // Wine Catalog Tests
+
     @Test
-    @AutoConfigureMockMvc
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void addProduct_ShouldReturnCreatedWine() throws Exception {
-        WineRequestDto requestDto = new WineRequestDto()
-                .setName("Sample Wine")
-                .setType("Dry")
-                .setColor("Red")
-                .setStrength("13%")
-                .setCountry("France")
-                .setGrape("Merlot")
-                .setPrice(BigDecimal.valueOf(20.00))
-                .setDescription("Description here");
+    @WithMockUser(roles = "ADMIN")
+    void addWine_ShouldReturnCreatedWine() throws Exception {
+        // Given
+        WineRequestDto requestDto = createWineRequestDto("Wine Test","Semi-Dry", "Red");
+        WineDto expectedWine = createWineDto(1L, "Wine Test","Semi-Dry", "Red");
 
-        WineDto expected = new WineDto(1L, "Sample Wine", "Dry",
-                "Red", "13%", "France", "Merlot",
-                BigDecimal.valueOf(20.00), "Description here");
-        when(wineService.save(any(WineRequestDto.class))).thenReturn(expected);
-
-        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+        // When
         MvcResult result = mockMvc.perform(post("/api/admin/catalog")
-                        .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON)
-                )
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        WineDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
-                WineDto.class);
-        Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.id());
-        Assertions.assertEquals(expected.name(), actual.name());
-        Assertions.assertEquals(expected, actual);
+        String jsonResponse = result.getResponse().getContentAsString();
+        WineDto actualWine = objectMapper.readValue(jsonResponse, WineDto.class);
 
+        // Then
+        assertNotNull(actualWine);
+        assertEquals(expectedWine.getName(), actualWine.getName());
+        assertEquals(expectedWine.getCountry(), actualWine.getCountry());
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(roles = "ADMIN")
     void updateProduct_ShouldReturnUpdatedWine() throws Exception {
+        // Given
         Long wineId = 1L;
-        WineRequestDto updateRequestDto = new WineRequestDto()
-                .setName("Updated Wine")
-                .setType("Semi-Dry")
-                .setColor("White")
-                .setStrength("12%")
-                .setCountry("Italy")
-                .setGrape("Chardonnay")
-                .setPrice(BigDecimal.valueOf(25.00))
-                .setDescription("Updated description");
+        WineRequestDto requestDto = createWineRequestDto("Wine","Dry", "White");
+        WineDto expectedWine = createWineDto(wineId, "Wine","Dry", "White");
 
-        WineDto expected = new WineDto(wineId, "Updated Wine", "Semi-Dry",
-                "White", "12%", "Italy", "Chardonnay",
-                BigDecimal.valueOf(25.00), "Updated description");
-
-        when(wineService.update(eq(1L), any(WineRequestDto.class))).thenReturn(expected);
-
-        String jsonRequest = objectMapper.writeValueAsString(updateRequestDto);
+        // When
         MvcResult result = mockMvc.perform(put("/api/admin/catalog/{id}", wineId)
-                        .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON)
-                )
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        WineDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
-                WineDto.class);
-        Assertions.assertNotNull(actual);
-        Assertions.assertEquals(expected.id(), actual.id());
-        Assertions.assertEquals(expected.name(), actual.name());
-        Assertions.assertEquals(expected, actual);
-    }
-
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void deleteProduct_ShouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/api/admin/catalog/1"))
-                .andExpect(status().isNoContent());
-    }
-
-    // Order Tests
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void getAllOrders_ShouldReturnOrderList() throws Exception {
-        OrderDto orderDto = new OrderDto()
-                .setId(1L)
-                .setUserId(1L)
-                .setOrderItems(Set.of(new OrderItemDto()))
-                .setOrderDate(LocalDateTime.now())
-                .setTotal(BigDecimal.valueOf(50.00))
-                .setStatus(Order.Status.PROCESSING);
-        when(orderService.findAll()).thenReturn(List.of(orderDto));
-
-        MvcResult result = mockMvc.perform(get("/api/admin/orders")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
+        WineDto actualWine = objectMapper.readValue(jsonResponse, WineDto.class);
 
-        List<OrderDto> actualOrders = Arrays.asList(objectMapper.readValue(jsonResponse,
-                OrderDto[].class));
-        Assertions.assertNotNull(actualOrders);
-        Assertions.assertEquals(1, actualOrders.size());
-        Assertions.assertEquals(orderDto.getStatus(), actualOrders.get(0).getStatus());
+        // Then
+        assertNotNull(actualWine);
+        assertEquals(expectedWine.getName(), actualWine.getName());
+        assertEquals(expectedWine.getCountry(), actualWine.getCountry());
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(roles = "ADMIN")
+    void deleteProduct_ShouldReturnNoContent() throws Exception {
+        // Given
+        Long wineId = 1L;
+
+        // When/Then
+        mockMvc.perform(delete("/api/admin/catalog/{id}", wineId))
+                .andExpect(status().isNoContent());
+    }
+
+    // Order Management Tests
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAllOrders_ShouldReturnOrderList() throws Exception {
+        // Given
+        List<OrderDto> expectedOrders = List.of(
+                createOrderDto(1L, BigDecimal.valueOf(100.05)),
+                createOrderDto(2L, BigDecimal.valueOf(40.00))
+        );
+
+        // When
+        MvcResult result = mockMvc.perform(get("/api/admin/orders"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        List<OrderDto> actualOrders = objectMapper.readValue(
+                jsonResponse,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, OrderDto.class)
+        );
+
+        // Then
+        assertEquals(expectedOrders.size(), actualOrders.size());
+        assertEquals(expectedOrders.get(0).getTotal(), actualOrders.get(0).getTotal());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void updateOrderStatus_ShouldReturnUpdatedOrder() throws Exception {
+        // Given
         Long orderId = 1L;
-        OrderStatusDto statusDto = new OrderStatusDto();
-        statusDto.setStatus(Order.Status.PROCESSING);
-        OrderDto orderDto = new OrderDto()
-                .setId(1L)
-                .setUserId(1L)
-                .setOrderItems(Set.of(new OrderItemDto()))
-                .setOrderDate(LocalDateTime.now())
-                .setTotal(BigDecimal.valueOf(50.00))
-                .setStatus(Order.Status.PROCESSING);
-        when(orderService.updateStatus(eq(orderId), any(OrderStatusDto.class)))
-                .thenReturn(orderDto);
+        OrderStatusDto statusDto = new OrderStatusDto().setStatus(Order.Status.PROCESSING);
 
-        String jsonRequest = objectMapper.writeValueAsString(statusDto);
-
+        // When
         MvcResult result = mockMvc.perform(put("/api/admin/orders/{id}/status", orderId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(objectMapper.writeValueAsString(statusDto)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
         OrderDto actualOrder = objectMapper.readValue(jsonResponse, OrderDto.class);
-        Assertions.assertNotNull(actualOrder);
-        Assertions.assertEquals(orderDto.getTotal(), actualOrder.getTotal());
+
+        // Then
+        assertNotNull(actualOrder);
+        assertEquals(Order.Status.PROCESSING, actualOrder.getStatus());
     }
 
-    // User Tests
-    @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void getAllUsers_ShouldReturnUserList() throws Exception {
-        AddressDto addressDto = new AddressDto()
-                .setArea("Dublin")
-                .setCity("Dublin")
-                .setStreet("43 avenue")
-                .setZipCode("65890");
-        UserDto userDto = new UserDto()
-                .setFirstName("John")
-                .setLastName("Doe")
-                .setEmail("john.doe@example.com")
-                .setShippingAddress(addressDto);
-        when(userService.getAll()).thenReturn(List.of(userDto));
+    // User Management Tests
 
-        MvcResult result = mockMvc.perform(get("/api/admin/users")
-                        .contentType(MediaType.APPLICATION_JSON))
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAllUsers_ShouldReturnUserList() throws Exception {
+        // Given
+        List<UserDto> expectedUsers = List.of(
+                createUserDto(1L, "user1@example.com"),
+                createUserDto(2L, "user2@example.com"),
+                createUserDto(3L, "testuser@example.com")
+        );
+
+        // When
+        MvcResult result = mockMvc.perform(get("/api/admin/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        List<UserDto> actualUsers = Arrays.asList(objectMapper.readValue(jsonResponse,
-                UserDto[].class));
-        Assertions.assertNotNull(actualUsers);
-        Assertions.assertEquals(1, actualUsers.size());
-        Assertions.assertEquals(userDto.getEmail(), actualUsers.get(0).getEmail());
+        List<UserDto> actualUsers = objectMapper.readValue(
+                jsonResponse,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, UserDto.class)
+        );
+
+        // Then
+        assertEquals(expectedUsers.size(), actualUsers.size());
+        assertEquals(expectedUsers.get(0).getEmail(), actualUsers.get(0).getEmail());
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(roles = "ADMIN")
     void updateDetails_ShouldReturnUpdatedUser() throws Exception {
+        // Given
         Long userId = 1L;
-        UserRoleRequestDto requestDto = new UserRoleRequestDto();
-        AddressDto addressDto = new AddressDto()
-                .setArea("Dublin")
-                .setCity("Dublin")
-                .setStreet("43 avenue")
-                .setZipCode("65890");
-        UserDto userDto = new UserDto()
-                .setFirstName("John")
-                .setLastName("Doe")
-                .setEmail("john.doe@example.com")
-                .setShippingAddress(addressDto);
-        when(userService.updateUserRoleInfo(eq(userId), any(UserRoleRequestDto.class)))
-                .thenReturn(userDto);
+        UserRoleRequestDto requestDto = createUpdatedDto();
+        UserDto expectedUser = new UserDto()
+                .setId(userId)
+                .setFirstName("NameUpdated")
+                .setLastName("LastNameUpdated")
+                .setEmail("updated@gmail.com");
 
-        String jsonRequest = objectMapper.writeValueAsString(requestDto);
-
+        // When
         MvcResult result = mockMvc.perform(put("/api/admin/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
         UserDto actualUser = objectMapper.readValue(jsonResponse, UserDto.class);
-        Assertions.assertNotNull(actualUser);
-        Assertions.assertEquals(userDto.getId(), actualUser.getId());
+
+        // Then
+        assertNotNull(actualUser);
+        assertEquals(expectedUser.getEmail(), actualUser.getEmail());
+        assertEquals(expectedUser.getLastName(), actualUser.getLastName());
+    }
+
+    // Helper Methods
+
+    private UserRoleRequestDto createUpdatedDto() {
+        Role updatedRole = new Role();
+        updatedRole.setRole(Role.RoleName.ADMIN);
+        return new UserRoleRequestDto()
+                .setFirstName("NameUpdated")
+                .setLastName("LastNameUpdated")
+                .setEmail("updated@gmail.com")
+                .setShippingAddress(
+                        new AddressDto()
+                                .setArea("Area")
+                                .setCity("City")
+                                .setStreet("Street")
+                                .setZipCode("Zip Code"))
+                .setRole(updatedRole);
+    }
+
+    private WineDto createWineDto(Long id, String name, String type, String color) {
+        return new WineDto()
+                .setId(id)
+                .setName(name)
+                .setType(type)
+                .setColor(color)
+                .setStrength("13%")
+                .setCountry("Italy")
+                .setGrape("Merlot")
+                .setPrice(BigDecimal.valueOf(20.00))
+                .setDescription("Rich red wine");
+    }
+
+    private WineRequestDto createWineRequestDto(String name, String type, String color) {
+        return new WineRequestDto()
+                .setName(name)
+                .setType(type)
+                .setColor(color)
+                .setStrength("13%")
+                .setCountry("Italy")
+                .setGrape("Merlot")
+                .setPrice(BigDecimal.valueOf(20.00))
+                .setDescription("Rich red wine");
+    }
+
+    private OrderDto createOrderDto(Long id, BigDecimal total) {
+        return new OrderDto()
+                .setId(id)
+                .setUserId(1L)
+                .setOrderDate(LocalDateTime.now())
+                .setTotal(total)
+                .setStatus(Order.Status.COMPLETED);
+    }
+
+    private UserDto createUserDto(Long id, String email) {
+        return new UserDto()
+                .setId(id)
+                .setFirstName("John")
+                .setLastName("Doe")
+                .setEmail(email);
     }
 }

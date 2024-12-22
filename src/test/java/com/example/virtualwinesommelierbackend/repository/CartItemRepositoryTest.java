@@ -20,6 +20,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Sql(scripts = {
+        "classpath:database/cleanup/cleanup-tables.sql",
+        "classpath:database/initialize/initialize_cart_items.sql"},
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -55,10 +59,6 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    @Sql(scripts = "classpath:test-sql/initialize_cart_items.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:test-sql/cleanup_cart_items.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByIdAndShoppingCartId_ShouldReturnCartItem() {
         Optional<CartItem> foundCartItem = cartItemRepository
                 .findByIdAndShoppingCartId(cartItem.getId(), shoppingCart.getId());

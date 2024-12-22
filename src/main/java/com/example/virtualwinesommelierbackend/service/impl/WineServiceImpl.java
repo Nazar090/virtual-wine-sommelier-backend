@@ -6,8 +6,10 @@ import com.example.virtualwinesommelierbackend.dto.wine.WineRequestDto;
 import com.example.virtualwinesommelierbackend.exception.EntityNotFoundException;
 import com.example.virtualwinesommelierbackend.mapper.WineMapper;
 import com.example.virtualwinesommelierbackend.model.Wine;
+import com.example.virtualwinesommelierbackend.repository.OrderItemRepository;
 import com.example.virtualwinesommelierbackend.repository.WineRepository;
 import com.example.virtualwinesommelierbackend.service.WineService;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WineServiceImpl implements WineService {
     private final WineRepository wineRepository;
+    private final OrderItemRepository orderItemRepository;
     private final WineMapper wineMapper;
 
     /**
@@ -82,7 +85,10 @@ public class WineServiceImpl implements WineService {
      * @param id The path variable to find and delete by it the certain product.
      */
     @Override
+    @Transactional
     public void deleteById(Long id) {
+        orderItemRepository.deleteByWineId(id);
+
         wineRepository.deleteById(id);
     }
 }

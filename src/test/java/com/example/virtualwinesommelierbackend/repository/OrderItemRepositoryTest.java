@@ -19,6 +19,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Sql(scripts = {
+        "classpath:database/cleanup/cleanup-tables.sql",
+        "classpath:database/initialize/add-user-order-wines-orderitems.sql"},
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -49,10 +53,6 @@ class OrderItemRepositoryTest {
     }
 
     @Test
-    @Sql(scripts = "classpath:test-sql/initialize_order_items.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:test-sql/cleanup_order_items.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByIdAndOrderId_ShouldReturnOrderItem() {
         Optional<OrderItem> foundOrderItem = orderItemRepository
                 .findByIdAndOrderId(orderItem.getId(), order.getId());
