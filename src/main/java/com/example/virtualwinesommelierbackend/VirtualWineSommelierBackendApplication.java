@@ -12,6 +12,7 @@ public class VirtualWineSommelierBackendApplication {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 
+        // Disable AWS SDK v1.x deprecation announcement warning
         System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
 
         SpringApplication.run(VirtualWineSommelierBackendApplication.class, args);
