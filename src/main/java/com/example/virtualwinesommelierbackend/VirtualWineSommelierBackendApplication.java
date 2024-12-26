@@ -12,6 +12,8 @@ public class VirtualWineSommelierBackendApplication {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 
+        System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
+
         SpringApplication.run(VirtualWineSommelierBackendApplication.class, args);
     }
 

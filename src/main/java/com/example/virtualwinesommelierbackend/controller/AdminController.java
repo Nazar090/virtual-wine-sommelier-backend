@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Controller responsible for handling administrative operations,
@@ -61,6 +63,24 @@ public class AdminController {
             description = "Adds a new wine product to the catalog")
     public WineDto addProduct(@RequestBody @Valid WineRequestDto requestDto) {
         return wineService.save(requestDto);
+    }
+
+    /**
+     * Uploads an image for the specified wine product.
+     * This endpoint allows adding or updating the image of a wine product.
+     *
+     * @param id   the ID of the wine product to which the image will be associated.
+     * @param file the image file to upload, provided as a multipart/form-data request.
+     * @return the updated WineDto object containing details of the wine product,
+     *         including the new image URL.
+     */
+    @PostMapping("/products/{id}/image")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add Product",
+            description = "Adds a new wine product to the catalog")
+    public WineDto uploadProductImage(@PathVariable Long id,
+                                      @RequestParam("file") MultipartFile file) {
+        return wineService.uploadFile(id, file);
     }
 
     /**

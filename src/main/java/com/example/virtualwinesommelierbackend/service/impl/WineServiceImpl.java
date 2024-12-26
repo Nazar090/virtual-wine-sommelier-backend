@@ -1,5 +1,8 @@
 package com.example.virtualwinesommelierbackend.service.impl;
 
+import com.amazonaws.services.kms.model.NotFoundException;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.virtualwinesommelierbackend.dto.wine.ProductDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineDto;
 import com.example.virtualwinesommelierbackend.dto.wine.WineRequestDto;
@@ -10,9 +13,13 @@ import com.example.virtualwinesommelierbackend.repository.OrderItemRepository;
 import com.example.virtualwinesommelierbackend.repository.WineRepository;
 import com.example.virtualwinesommelierbackend.service.WineService;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Wine Service Implementation focused on business management wine's data from DB.
@@ -23,6 +30,11 @@ public class WineServiceImpl implements WineService {
     private final WineRepository wineRepository;
     private final OrderItemRepository orderItemRepository;
     private final WineMapper wineMapper;
+    private final AmazonS3 amazonS3;
+
+    @Value("${aws.s3.winesommelierimages}")
+    private String bucketName;
+
 
     /**
      * Save product in DB, only for users with a higher role than 'USER'.
@@ -90,5 +102,22 @@ public class WineServiceImpl implements WineService {
         orderItemRepository.deleteByWineId(id);
 
         wineRepository.deleteById(id);
+    }
+
+    @Override
+    public WineDto uploadFile(Long id, MultipartFile file) {
+        String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String imageUrl;
+        try {
+            amazonS3.putObject(bucketName, fileName, file.getInputStream(), new ObjectMetadata());
+            imageUrl = amazonS3.getUrl(bucketName, fileName).toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload file", e);
+        }
+
+        Wine wine = wineRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("Product not found"));
+        wine.setImageUrl(imageUrl);
+        return wineMapper.toDto(wineRepository.save(wine));
     }
 }
