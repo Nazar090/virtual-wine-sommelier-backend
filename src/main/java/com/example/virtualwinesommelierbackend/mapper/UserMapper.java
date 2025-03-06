@@ -15,6 +15,10 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     UserRegistrationDto toRegistrationDto(User user);
 
+    @Mapping(target = "role", expression = "java(user.getRoles() != null"
+            + " && !user.getRoles().isEmpty()"
+            + " ? user.getRoles().iterator().next().getRole().name() : null)")
+
     UserDto toDto(User user);
 
     @Mapping(target = "shippingAddress", source = "shippingAddress")
